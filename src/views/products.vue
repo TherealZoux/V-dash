@@ -13,26 +13,22 @@
       v-for="product in products" :product="product"
       />
     </div>
-   <!--  <AppTable
-      :columns="columns"
-      :data="products"
-      header="All products"
-      class="mt-8"
-      :initialValues="initialValues"
-      :fields="fields"
+    <CRUDDialog
       :visible="visible"
+      title="Add new product"
+      :fields="fields"
+      :initialData="initialValues"
       :validationSchema="validationSchema"
-      @close="handleCloseDialog"
-      @save="handleAddProduct"
+      @update:visible="handleCloseDialog"
       :submit="handleAddProduct"
-    /> -->
-</section>
+    />
+  </section>
 </template>
 
 <script lang="ts" setup>
-import AppTable from "@/components/AppTable.vue";
 import ProductCard from '../components/ProductCard.vue'
 import SectionHeader from "@/components/SectionHeader.vue";
+import CRUDDialog from "@/components/dialogs/CRUDDialog.vue";
 import { useProductsStore } from "@/stores/ProductsStore";
 import { computed, onMounted, h, ref } from "vue";
 import * as yup from "yup";
@@ -167,24 +163,11 @@ const validationSchema = yup.object({
 });
 
 const fields = computed(() => [
-  { name: "title", type: "text", required: true },
-  { name: "description", type: "textarea", required: false },
-  { name: "category", type: "text", required: false },
-  { name: "price", type: "number", required: false },
-  { name: "discountPercentage", type: "number", required: false },
-  { name: "rating", type: "number", required: false },
-  { name: "stock", type: "number", required: false },
-  { name: "tags", type: "text", required: false },
-  { name: "brand", type: "text", required: false },
-  { name: "sku", type: "text", required: false },
-  { name: "weight", type: "number", required: false },
-  { name: "dimensions", type: "text", required: false },
-  { name: "warrantyInformation", type: "textarea", required: false },
-  { name: "shippingInformation", type: "textarea", required: false },
-  { name: "returnPolicy", type: "textarea", required: false },
-  { name: "minimumOrderQuantity", type: "number", required: false },
-  { name: "thumbnail", type: "text", required: false },
-  { name: "image", type: "text", required: false },
+  { name: "title", label: "Title", type: "text", required: true },
+  { name: "description", label: "Description", type: "textarea", required: false },
+  { name: "thumbnail", label: "Image URL", type: "text", required: false },
+  { name: "category", label: "Category", type: "text", required: false },
+  { name: "price", label: "Price", type: "number", required: false },
 ]);
 
 const openAddDialog = () => {
@@ -194,9 +177,13 @@ const handleCloseDialog = () => {
   visible.value = false;
 };
 const handleAddProduct = async (values: any) => {
+  console.log('Submitting:', values);
   try {
     await store.createProduct(values);
-  } catch (error) {}
+    visible.value = false;
+  } catch (error) {
+    console.error('Error:', error);
+  }
 };
 onMounted(async () => {
   await store.getAllProducts();

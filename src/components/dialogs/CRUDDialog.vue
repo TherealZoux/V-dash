@@ -10,7 +10,7 @@
   >
     <AppForm
       :initial-values="initialData"
-      :onSubmit="submit"
+      :onSubmit="handleSubmit"
       :validation-schema="validationSchema"
       :login="false"
       v-slot="{ errors }"
@@ -109,7 +109,7 @@
                   // If the field expects a number, cast the value to number
                   if (
                     field.type === 'select' &&
-                    (field.valueType === 'number' || field.valueType === Number)
+                    field.valueType === 'number'
                   ) {
                     const numericValue =
                       selectedValue !== null && selectedValue !== undefined
@@ -211,7 +211,7 @@
   </Dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import { Field } from "vee-validate";
 import Dialog from "primevue/dialog";
@@ -225,7 +225,20 @@ import Calendar from "primevue/calendar";
 import Button from "primevue/button";
 import AppForm from "../AppForm.vue";
 
-// Props
+interface FormField {
+  name: string;
+  label?: string;
+  type: string;
+  required?: boolean;
+  placeholder?: string;
+  options?: any[];
+  optionLabel?: string;
+  optionValue?: string;
+  valueType?: string | 'number';
+  checkboxLabel?: string;
+  rows?: number;
+}
+
 const props = defineProps({
   visible: {
     type: Boolean,
@@ -236,11 +249,8 @@ const props = defineProps({
     required: true,
   },
   fields: {
-    type: Array,
+    type: Array as () => FormField[],
     required: true,
-    validator: (fields) => {
-      return fields.every((field) => field.name && field.label && field.type);
-    },
   },
   validationSchema: {
     type: Object,
@@ -257,7 +267,6 @@ const props = defineProps({
   mode: {
     type: String,
     default: "create",
-    validator: (value) => ["create", "edit"].includes(value),
   },
   submit: {
     type: Function,
@@ -266,7 +275,11 @@ const props = defineProps({
 });
 
 // Emits
-const emit = defineEmits(["update:visible", "submit", "cancel"]);
+const emit = defineEmits<{
+  (e: "update:visible", value: boolean): void;
+  (e: "submit", value: any): void;
+  (e: "cancel"): void;
+}>();
 
 // Refs
 const formRef = ref(null);
@@ -290,6 +303,11 @@ const onCancel = () => {
 
 const onDialogHide = () => {
   emit("update:visible", false);
+};
+
+const handleSubmit = (values: any) => {
+  console.log('CRUDDialog handleSubmit:', values);
+  props.submit(values);
 };
 </script>
 

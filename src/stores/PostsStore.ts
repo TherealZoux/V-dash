@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { useCrud } from "@/composables/useCrud";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 export const usePostsStore = defineStore("postsStore", () => {
   const posts = ref();
@@ -8,17 +8,51 @@ export const usePostsStore = defineStore("postsStore", () => {
   const currentPost = ref();
   const error = ref();
   const loading = ref(false);
+  const total = ref(0);
+  const pageSize = ref(10);
+  const currentSkip = ref(0);
 
-  const getAllPosts = async (limit?: any, skip?: any) => {
+  const hasMore = computed(() => currentSkip.value < total.value);
+
+  const getAllPosts = async (limit?: number, skip?: number, appendMode = false) => {
+    loading.value = true;
     try {
-      const res = await useCrud("/posts").list({ limit: limit, skip: skip });
-      posts.value = res;
+      const effectiveLimit = limit ?? pageSize.value;
+      const effectiveSkip = skip ?? currentSkip.value;
+      const res = await useCrud("/posts").list({ limit: effectiveLimit, skip: effectiveSkip });
+      
+      if (!res?.data) {
+        return posts;
+      }
+      
+      if (appendMode) {
+        if (posts.value?.data?.posts) {
+          posts.value.data.posts = [...posts.value.data.posts, ...res.data.posts];
+        }
+      } else {
+        posts.value = res;
+      }
+      
+      total.value = res.data?.total || 0;
+      currentSkip.value = effectiveSkip + effectiveLimit;
       return posts;
     } catch (error) {
       console.log(error);
+    } finally {
+      loading.value = false;
     }
   };
-  const getAllComments = async (limit?: any, skip?: any) => {
+
+  const loadMore = () => {
+    getAllPosts(pageSize.value, currentSkip.value, true);
+  };
+
+  const resetAndFetch = () => {
+    currentSkip.value = 0;
+    getAllPosts(pageSize.value, 0, false);
+  };
+
+  const getAllComments = async (limit?: number, skip?: number) => {
     try {
       const res = await useCrud("/comments").list({ limit: limit, skip: skip });
       comments.value = res;
@@ -56,9 +90,9 @@ export const usePostsStore = defineStore("postsStore", () => {
   const createPost = async (payload: any) => {
     try {
       const res = await useCrud("/posts/add").create(payload);
-      posts.value.data.posts.unshift(res);
-      console.log(res);
-
+      if (posts.value?.data?.posts) {
+        posts.value.data.posts.unshift(res);
+      }
       return res;
     } catch (err: any) {
       console.log(err);
@@ -71,13 +105,19 @@ export const usePostsStore = defineStore("postsStore", () => {
     posts,
     comments,
     currentPost,
-    loading,
     error,
+    loading,
+    total,
+    pageSize,
+    currentSkip,
+    hasMore,
     getAllPosts,
     getAllComments,
     getPostById,
     getUserPosts,
     getPostComments,
     createPost,
+    loadMore,
+    resetAndFetch,
   };
 });

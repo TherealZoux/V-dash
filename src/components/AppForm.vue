@@ -2,7 +2,7 @@
   <Form
     :validation-schema="validationSchema"
     :initial-values="initialValues"
-    @submit="onSubmit"
+    @submit="handleSubmit"
     v-slot="{ errors }"
   >
     <div class="flex flex-col gap-4">
@@ -33,4 +33,9 @@ const { validationSchema, initialValues, login, onSubmit, onCancel } =
     onSubmit: (values: any) => void;
     onCancel?: () => void;
   }>();
+
+const handleSubmit = (values: any) => {
+  console.log('AppForm submitting:', values);
+  onSubmit(values);
+};
 </script>

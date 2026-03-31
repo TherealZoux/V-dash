@@ -89,7 +89,10 @@ const props = defineProps({
   data: Array as () => any[],
   columns: Array as () => any[],
   header: String,
-  addDialogTitle: String,
+  addDialogTitle: {
+    type: String,
+    default: 'Add Item',
+  },
   loading: Boolean,
   class: String,
   actions: {

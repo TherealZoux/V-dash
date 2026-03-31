@@ -56,7 +56,7 @@ onMounted(async () => {
             : {}
         "
       />
-      <main class="w-full flex flex-col overflow-y-auto m-2 rounded-lg border-1 border-gray-200 bg-white">
+      <main class="w-full flex flex-col overflow-y-auto m-2 rounded-lg border border-gray-200 ">
         <Navbar v-if="route.name !== 'Login'" class="h-fit" />
         <RouterView />
       </main>

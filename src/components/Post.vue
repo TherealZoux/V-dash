@@ -1,6 +1,6 @@
 <template>
   <article
-    class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 transition hover:border-indigo-100"
+    class=" border border-gray-100 rounded-2xl shadow-sm p-6 transition hover:border-indigo-100"
   >
     <header class="flex items-center gap-4">
       <img
@@ -16,7 +16,7 @@
         {{ getInitials(user) }}
       </div>
       <div>
-        <p class="text-lg font-semibold text-gray-900">
+        <p class="text-lg font-semibold ">
           {{ formatFullName(user) }}
         </p>
         <p class="text-sm text-gray-500">
@@ -28,11 +28,11 @@
     <div class="mt-4 space-y-3">
       <h3
         v-if="post.title"
-        class="text-xl font-semibold text-gray-900 leading-tight"
+        class="text-xl font-semibold  leading-tight"
       >
         {{ post.title }}
       </h3>
-      <p class="text-base text-gray-700 leading-relaxed">
+      <p class="text-base  leading-relaxed">
         {{ post.body }}
       </p>
       <div class="flex flex-wrap gap-6 text-sm text-gray-500">

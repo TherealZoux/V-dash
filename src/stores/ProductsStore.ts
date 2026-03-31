@@ -9,7 +9,7 @@ export const useProductsStore = defineStore("productsStore", () => {
   const error = ref();
   const loading = ref(false);
 
-  const getAllProducts = async (limit: any = 10, skip: any = 0) => {
+  const getAllProducts = async (limit: any = 20, skip: any = 0) => {
     try {
       loading.value = true;
       const res = await useCrud("/products").list({ limit: limit, skip: skip });

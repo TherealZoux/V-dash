@@ -23,18 +23,27 @@
       :validationSchema="validationSchema"
       @close="handleCloseDialog"
     />
+    <Paginator
+      :first="(userStore.currentPage - 1) * userStore.pageSize"
+      :rows="userStore.pageSize"
+      :totalRecords="userStore.total"
+      :rowsPerPageOptions="[10, 20, 50]"
+      @page="handlePageChange"
+      class="mt-4"
+    />
   </section>
 </template>
 
 <script lang="ts" setup>
 import AppTable from "@/components/AppTable.vue";
+import Paginator from "primevue/paginator";
 import SectionHeader from "@/components/SectionHeader.vue";
 import { useUserStore } from "@/stores/UserStore";
 import { computed, onMounted, h, ref } from "vue";
 import * as yup from "yup";
 
 const userStore = useUserStore();
-const users = computed(() => userStore?.data?.users);
+const users = computed(() => userStore?.data?.users || []);
 const visible = ref(false);
 const loading = computed(() => userStore.loading);
 
@@ -177,6 +186,13 @@ const handleAddProduct = (values: any) => {
   userStore.createUser(values);
   visible.value = false;
 };
+const handlePageChange = (event: { page: number; rows: number }) => {
+  userStore.setPage(event.page + 1);
+  if (event.rows !== userStore.pageSize) {
+    userStore.setPageSize(event.rows);
+  }
+};
+
 onMounted(async () => {
   await userStore.getAllUsers();
 });

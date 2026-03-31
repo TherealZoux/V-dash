@@ -18,6 +18,15 @@
       >
         Nothing to show yet. Try adding a new post.
       </div>
+
+      <div v-if="store.hasMore" class="flex justify-center mt-6">
+        <Button
+          label="Load More Posts"
+          :loading="store.loading"
+          @click="store.loadMore()"
+          class="px-6 py-2"
+        />
+      </div>
     </div>
 
     <CRUDDialog
@@ -41,6 +50,7 @@ import { useUserStore } from "@/stores/UserStore";
 import { computed, onMounted, ref } from "vue";
 import * as yup from "yup";
 import Post from "@/components/Post.vue";
+import Button from "primevue/button";
 const store = usePostsStore();
 const usersStore = useUserStore();
 const visible = ref(false);
